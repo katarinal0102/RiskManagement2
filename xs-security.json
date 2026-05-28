@@ -1,0 +1,48 @@
+{
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.RiskManager",
+      "description": "RiskManager"
+    },
+    {
+      "name": "$XSAPPNAME.RiskViewer",
+      "description": "RiskViewer"
+    }
+  ],
+  "attributes": [],
+  "role-templates": [
+    {
+      "name": "RiskManager",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.RiskManager"
+      ],
+      "attribute-references": []
+    },
+    {
+      "name": "RiskViewer",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.RiskViewer"
+      ],
+      "attribute-references": []
+    }
+  ],
+  "role-collections": [
+    {
+        "name": "RiskManager (RiskManagement2 CERT)",
+        "description": "generated",
+        "role-template-references": [
+          "$XSAPPNAME.RiskManager"
+        ]
+      },
+      {
+        "name": "RiskViewer (RiskManagement2 CERT)",
+        "description": "generated",
+        "role-template-references": [
+          "$XSAPPNAME.RiskViewer"
+        ]
+      }
+    ]
+
+}
