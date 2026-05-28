@@ -96,7 +96,7 @@ annotate service.Risks with {
             {
                 $Type : 'Common.ValueListParameterInOut',
                 LocalDataProperty : miti_ID,
-                ValueListProperty : 'ID',
+                ValueListProperty : 'Mitigration ID',
             },
             {
                 $Type : 'Common.ValueListParameterDisplayOnly',
