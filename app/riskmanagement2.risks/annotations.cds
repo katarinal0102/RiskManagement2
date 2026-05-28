@@ -85,6 +85,7 @@ annotate service.Risks with @(
             Label : 'supplier_BusinessPartner',
             Value : supplier_BusinessPartner,
         },
+
     ],
 );
 
@@ -96,7 +97,7 @@ annotate service.Risks with {
             {
                 $Type : 'Common.ValueListParameterInOut',
                 LocalDataProperty : miti_ID,
-                ValueListProperty : 'Mitigration ID',
+                ValueListProperty : 'ID',
             },
             {
                 $Type : 'Common.ValueListParameterDisplayOnly',
