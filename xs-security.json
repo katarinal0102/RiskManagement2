@@ -7,6 +7,13 @@
     {
       "name": "$XSAPPNAME.RiskViewer",
       "description": "RiskViewer"
+    },
+    {
+      "name": "$XSAPPNAME.mtcallback",
+      "description": "Subscription via SaaS Registry",
+      "grant-as-authority-to-apps": [
+        "$XSAPPNAME(application,sap-provisioning,tenant-onboarding)"
+      ]
     }
   ],
   "attributes": [],
@@ -30,19 +37,18 @@
   ],
   "role-collections": [
     {
-        "name": "RiskManager (RiskManagement2 CERT)",
-        "description": "generated",
-        "role-template-references": [
-          "$XSAPPNAME.RiskManager"
-        ]
-      },
-      {
-        "name": "RiskViewer (RiskManagement2 CERT)",
-        "description": "generated",
-        "role-template-references": [
-          "$XSAPPNAME.RiskViewer"
-        ]
-      }
-    ]
-
+      "name": "RiskManager (RiskManagement2 CERT)",
+      "description": "generated",
+      "role-template-references": [
+        "$XSAPPNAME.RiskManager"
+      ]
+    },
+    {
+      "name": "RiskViewer (RiskManagement2 CERT)",
+      "description": "generated",
+      "role-template-references": [
+        "$XSAPPNAME.RiskViewer"
+      ]
+    }
+  ]
 }

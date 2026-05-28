@@ -26,15 +26,7 @@ modules:
           srv-url: ${default-url}
     requires:
       - name: RiskManagement2-auth
-      - name: RiskManagement2-db
       - name: RiskManagement2-destination
-
-  - name: RiskManagement2-db-deployer
-    type: hdb
-    path: gen/db
-    parameters:
-      buildpack: nodejs_buildpack
-    requires:
       - name: RiskManagement2-db
   - name: RiskManagement2
     type: approuter.nodejs
@@ -52,11 +44,18 @@ modules:
           forwardAuthToken: true
       - name: RiskManagement2-auth
       - name: RiskManagement2-html5-runtime
+      - name: mtx-api
+        group: destinations
+        properties:
+          name: mtx-api # must be used in xs-app.json as well
+          url: ~{mtx-url}
     provides:
       - name: app-api
         properties:
           app-protocol: ${protocol}
           app-uri: ${default-uri}
+    properties:
+      TENANT_HOST_PATTERN: "^(.*)-${default-uri}"
 
   - name: RiskManagement2-app-deployer
     type: com.sap.application.content
@@ -146,6 +145,41 @@ modules:
               ServiceKeyName: RiskManagement2-auth-key
               sap.cloud.service: RiskManagement2.service
 
+  - name: RiskManagement2-mtx
+    type: nodejs
+    path: gen/mtx/sidecar
+    requires:
+      - name: RiskManagement2-auth
+      - name: RiskManagement2-db
+      - name: RiskManagement2-registry
+      - name: app-api
+        properties:
+          SUBSCRIPTION_URL: ~{app-protocol}://\${tenant_subdomain}-~{app-uri}
+      - name: RiskManagement2-destination
+      - name: RiskManagement2-html5-runtime
+      - name: RiskManagement2-html5-repo-host
+    build-parameters:
+      builder: npm-ci
+    parameters:
+      instances: 1
+      memory: 256M
+      disk-quota: 512M
+    hooks:
+      - name: upgrade-all
+        type: task
+        phases:
+          - blue-green.application.before-start.idle
+          - deploy.application.before-start
+        parameters:
+          name: upgrade
+          memory: 512M # increase as required
+          disk-quota: 768M # increase as required
+          command: cds-mtx upgrade '*'
+    provides:
+      - name: mtx-api
+        properties:
+          mtx-url: ${default-url}
+
 resources:
   - name: RiskManagement2-auth
     type: org.cloudfoundry.managed-service
@@ -155,7 +189,7 @@ resources:
       path: ./xs-security.json
       config:
         xsappname: RiskManagement2-CERT
-        tenant-mode: dedicated
+        tenant-mode: shared
         oauth2-configuration:
           credential-types:
             - "binding-secret"
@@ -164,16 +198,23 @@ resources:
             - https://*~{app-api/app-uri}/**
     requires:
       - name: app-api
-  - name: RiskManagement2-db
-    type: com.sap.xs.hdi-container
-    parameters:
-      service: hana
-      service-plan: hdi-shared
   - name: RiskManagement2-destination
     type: org.cloudfoundry.managed-service
     parameters:
       service: destination
       service-plan: lite
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          subaccount:
+            existing_destinations_policy: update
+            destinations:
+              - Name: RiskManagement2-workzone-runtime
+                Authentication: NoAuthentication
+                Type: HTTP
+                ProxyType: Internet
+                URL: https://${org}.launchpad.${default-domain}
+                CEP.HTML5contentprovider: true
     requires:
       - name: srv-api
 
@@ -187,3 +228,28 @@ resources:
     parameters:
       service: html5-apps-repo
       service-plan: app-runtime
+  - name: RiskManagement2-db
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: service-manager
+      service-plan: container
+  - name: RiskManagement2-registry
+    type: org.cloudfoundry.managed-service
+    requires:
+      - name: mtx-api
+    parameters:
+      service: saas-registry
+      service-plan: application
+      config:
+        xsappname: RiskManagement2-${org}-${space}
+        appName: RiskManagement2-${org}-${space}
+        displayName: RiskManagement2
+        description: A simple CAP project.
+        category: 'Category'
+        appUrls:
+          getDependencies: ~{mtx-api/mtx-url}/-/cds/saas-provisioning/dependencies
+          onSubscription: ~{mtx-api/mtx-url}/-/cds/saas-provisioning/tenant/{tenantId}
+          onSubscriptionAsync: true
+          onUnSubscriptionAsync: true
+          onUpdateDependenciesAsync: true
+          callbackTimeoutMillis: 300000 # Increase if your deployments are taking longer than that
