@@ -1,5 +1,5 @@
 _schema-version: '1.0'
-repository: <your-container-registry-server>
+repository: docker.io/katarina0102
 tag: latest
 modules:
   - name: RiskManagement2-srv

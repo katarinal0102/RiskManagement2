@@ -5,7 +5,7 @@ global:
   imagePullSecret:
     name: docker-registry
   image:
-    registry: <your-container-registry-server>
+    registry: docker.io/katarina0102
     tag: latest
 srv:
   bindings:
@@ -16,7 +16,7 @@ srv:
     destination:
       serviceInstanceName: destination
   image:
-    repository: RiskManagement2-srv
+    repository: riskamangement-srv
   resources:
     limits:
       ephemeral-storage: 1G

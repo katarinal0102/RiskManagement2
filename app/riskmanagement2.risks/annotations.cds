@@ -154,9 +154,6 @@ annotate service.Risks with {
 
 annotate service.A_BusinessPartner with {
     BusinessPartnerFullName @(
-        Common.Text : {
-            TextProperty : 'BusinessPartnerFullName',
-        },
         Common.ValueList : {
             $Type : 'Common.ValueListType',
             CollectionPath : 'A_BusinessPartner',
